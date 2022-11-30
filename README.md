@@ -5,7 +5,7 @@
 + Lưu ý tách branch để làm, mỗi khi xong nội dung thì mới push lên main.
 
 ## Log
----
 ### 221130
 + Khởi tạo Repos.
 + Thiết kế kiến trúc app.
+---
