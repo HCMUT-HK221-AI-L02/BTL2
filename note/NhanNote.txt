@@ -1,4 +1,0 @@
-* Đọc lại luật 
-
-* Liệt kê các hàm cần sử dụng trong app:
-- 
