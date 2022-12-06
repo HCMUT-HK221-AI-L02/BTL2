@@ -8,3 +8,6 @@ class Piece:
 
     def inputPosibleMove(self, posibleMove: list):
         self.posibleMove = posibleMove
+
+    def movePiece(self, des: tuple):
+        self.pos = des

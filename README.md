@@ -1,6 +1,5 @@
 # BTL2
 ## Hướng dẫn chung
-
 + Mỗi khi push một nội dung mới lên, thành viên trong nhóm lưu ý log lại trong readme.
 + Lưu ý tách branch để làm, mỗi khi xong nội dung thì mới push lên main.
 + Các hàm cần sử dụng được đặt trong folder app.
@@ -13,8 +12,10 @@
 + Chuẩn bị việc build file cuối cùng để nộp:
 
 ## TODO
-+ Hoàn thành nốt kiến trúc
-+ Giải thích các thuật ngữ sử dụng trong code.
++ Hoàn thành nốt kiến trúc (done)
++ Giải thích các thuật ngữ sử dụng trong code (process)
++ Hoàn thanh pvp (process)
++ Cập nhật updatePosibleMove có thế cờ mở
 
 ## Giải thích một số thuật ngữ:
 + board và prev_board là array 2D, dùng để nhập vào move
