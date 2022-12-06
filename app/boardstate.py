@@ -15,6 +15,7 @@ class BoardState:
         self.pieceList = []
         self.boardPlacement = []
         self.trapMoveList = []
+        self.victor = 0
         self.createPieceListAndBoardPlacement()
         self.createTrapMoveList()
         self.updatePosibleMove()
@@ -72,26 +73,51 @@ class BoardState:
                 piece.inputPosibleMove(posibleMove)
         
 
+    # Hàm update lại board của state
+    def updateBoard(self):
+        for i in range(5):
+            for j in range(5):
+                if self.boardPlacement[i][j] == None: self.board[i][j] = 0
+                else: self.board[i][j] = self.boardPlacement[i][j].team
+
 
     # Hàm kiểm tra tupleMove có thực hiện được hay không
-    def boardMoveChk(self, moveTupple):
+    def boardMoveChk(self, moveTupple, turnOf):
         # Từ moveTupple lấy ra vị trí bắt đầu và kết thúc
+        startTuple = moveTupple[0]
+        endTuple = moveTupple[1]
         # Từ vị trí bắt đầu lấy ra piece -> có thể return false
+        piece = self.boardPlacement[startTuple[0]][startTuple[1]]
+        if piece == None: return False
+        # Nếu piece này thuộc lượt người khác thì return false
+        if piece.team != turnOf: return False
         # Từ piece lấy ra posible move -> có thể return
-        return
+        posibleMove = piece.posibleMove
+        if len(posibleMove) == 0: return False
+        if moveTupple in posibleMove: return True
 
 
     # Định nghĩa hàm di chuyển một quân cờ trong board này
     def boardMove(self, moveTupple):
         # Backup lại prev_move
-        # Thực hiện di chuyển quân cờ
-            # Cập nhật danh sách quân cờ và bàn cờ sau khi di chuyển
+        self.prev_board = self.board
+        # Thực hiện lấy piece
+        startTuple = moveTupple[0]        
+        piece = self.boardPlacement[startTuple[0]][startTuple[1]]
+        # Cập nhật bàn cờ sau khi di chuyển
+        endTuple = moveTupple[1]
+        self.boardPlacement[endTuple[0]][endTuple[1]] = piece
+        self.boardPlacement[startTuple[0]][startTuple[1]] = None
         # Cập nhật vị trí mới của quân cờ vừa đi
+        piece.movePiece(endTuple)
         # Thực hiện thay đổi màu do gánh
+        self.ganh(endTuple)
         # Thực hiện thay đổi màu do vây
+        self.vay()
         # Cập nhật board
+        self.updateBoard()
         # update posiblemove
-        return
+        self.updatePosibleMove()        
 
 
     # Định nghĩa hàm kiểm tra việc gánh quân cờ
