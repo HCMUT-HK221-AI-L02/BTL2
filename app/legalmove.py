@@ -1,3 +1,4 @@
+# Bao gồm danh sách các legal move và hàm kiểm tra legal move
 LEGALMOVE = [
     # Hàng 0
     [
@@ -65,3 +66,13 @@ LEGALMOVE = [
         [((4, 4), (3, 5)), ((4, 4), (3, 4)), ((4, 4), (4, 3))]
     ]
 ]
+
+# Hàm kiểm tra một move có legal hay không
+def legalMoveChk(moveTupple: tuple) -> bool:
+    # Tìm tọa độ bắt đầu
+    startTuple = moveTupple[0]
+    # Lấy ra danh sách legal move tại tọa độ bắt đầu
+    legalMoveList = LEGALMOVE[startTuple[0]][startTuple[1]]
+    # Kiểm tra xem moveTupple có nằm trong list hay không
+    if legalMoveList.count(moveTupple) != 0: return True
+    else: return False
