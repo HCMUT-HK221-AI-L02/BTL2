@@ -11,3 +11,6 @@ class Piece:
 
     def movePiece(self, des: tuple):
         self.pos = des
+
+    def changeTeam(self):
+        self.team = self.team * (-1)

@@ -3,6 +3,7 @@
 # Có thủ tục tạo object
 
 from app.legalmove import *
+from app.positionstep import *
 from app.piece import *
 
 class BoardState:
@@ -85,7 +86,6 @@ class BoardState:
     def boardMoveChk(self, moveTupple, turnOf):
         # Từ moveTupple lấy ra vị trí bắt đầu và kết thúc
         startTuple = moveTupple[0]
-        endTuple = moveTupple[1]
         # Từ vị trí bắt đầu lấy ra piece -> có thể return false
         piece = self.boardPlacement[startTuple[0]][startTuple[1]]
         if piece == None: return False
@@ -95,6 +95,20 @@ class BoardState:
         posibleMove = piece.posibleMove
         if len(posibleMove) == 0: return False
         if moveTupple in posibleMove: return True
+
+
+
+    def victorCHK(self):
+        flag = True
+        leadTeam = self.pieceList[0].team
+        for piece in self.pieceList:
+            if piece.team != leadTeam:
+                flag = False
+                break
+        if flag == True:
+            self.victor = leadTeam
+            return leadTeam
+        else: return 0
 
 
     # Định nghĩa hàm di chuyển một quân cờ trong board này
@@ -117,18 +131,55 @@ class BoardState:
         # Cập nhật board
         self.updateBoard()
         # update posiblemove
-        self.updatePosibleMove()        
+        self.updatePosibleMove()  
+        # Kiểm tra người chiến thắng
+        self.victorCHK()
 
 
     # Định nghĩa hàm kiểm tra việc gánh quân cờ
-    def ganh(board, position):
-        # Kiểm tra xem quân cờ nào bị đổi màu
-        # Trả ra danh sách quân cờ bị đổi màu do gánh
-        return
+    def ganh(self, position) -> bool:
+        # Tạo danh sách quân cờ bị đổi màu
+        enemy = self.boardPlacement[position[0]][position[1]].team*(-1)
+        toChange = []
+        # Loop qua 4 cặp ô cần xét
+        for i in range(4):
+            # Tạo cặp pos cần xet
+            if i == 0: 
+                pos1 = (position[0] + POSITIONSTEP[0][0], position[1] + POSITIONSTEP[0][1])
+                pos2 = (position[0] + POSITIONSTEP[7][0], position[1] + POSITIONSTEP[7][1])
+            elif i == 1:
+                pos1 = (position[0] + POSITIONSTEP[1][0], position[1] + POSITIONSTEP[1][1])
+                pos2 = (position[0] + POSITIONSTEP[6][0], position[1] + POSITIONSTEP[6][1])
+            elif i == 2:
+                pos1 = (position[0] + POSITIONSTEP[2][0], position[1] + POSITIONSTEP[2][1])
+                pos2 = (position[0] + POSITIONSTEP[5][0], position[1] + POSITIONSTEP[5][1])
+            elif i == 3:
+                pos1 = (position[0] + POSITIONSTEP[3][0], position[1] + POSITIONSTEP[3][1])
+                pos2 = (position[0] + POSITIONSTEP[4][0], position[1] + POSITIONSTEP[4][1])
+            # Kiểm tra pos có nằm ngoài bàn cờ, nếu faile thì ko thêm vào list
+            if pos1[0] < 0 or pos2[0] < 0 or pos1[0] > 4 or pos2[0] > 4: continue
+            if pos1[1] < 0 or pos2[1] < 0 or pos1[1] > 4 or pos2[1] > 4: continue
+            # Kiểm tra legal move, nếu faile thì ko thêm vào List
+            moveTupple = (position, pos1)
+            if legalMoveChk(moveTupple) == False: continue
+            moveTupple = (position, pos2)
+            if legalMoveChk(moveTupple) == False: continue
+            # Kiểm tra xem nếu không có đủ 2 quân cờ đối xứng thì skip
+            if self.boardPlacement[pos1[0]][pos1[1]].team != enemy: continue
+            if self.boardPlacement[pos2[0]][pos2[1]].team != enemy: continue
+            # Thêm 2 quân cờ trên vào trong danh sách đổi team
+            toChange.append(self.boardPlacement[pos1[0]][pos1[1]])
+            toChange.append(self.boardPlacement[pos2[0]][pos2[1]])
+        # Đổi team các quân cờ trong list
+        if len(toChange) == 0: return False
+        else: 
+            for piece in toChange: piece.changeTeam()
+            return True
+
 
 
     # Định nghĩa hàm kiểm tra việc vây quân cờ
-    def vay(board):
+    def vay(self):
         # Duyệt qua toàn bộ board, xem quân nào bị vây
         # Trả ra danh sách quân cờ bị đổi màu
         return
