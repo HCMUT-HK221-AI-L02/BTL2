@@ -2,7 +2,7 @@
 # Nếu một moveTupple không hợp lệ thì bắt chọn lại moveTupple
 
 # Import thư viện và hàm
-from app.boardstate import *
+from app.state import *
 
 def main():
     # Khởi tạo bàn cờ đầu tiên
@@ -12,18 +12,13 @@ def main():
                     [1, 0, 0, 0, -1],
                     [-1, 0, 0, 0, -1],
                     [-1, -1, -1, -1, -1]]
-    master_board = BoardState(None, start_board)
+    master_board = State(None, start_board)
     # Chọn 'X' đi trước hay 'O' đi trước
-    turnOf = input("Input start player, 1 or -1: ")
+    turnOf = 0
+    while turnOf != 1 and turnOf != -1:
+        turnOf = int(input("Input start player, 1 or -1: "))
     # Tạo file txt để theo dõi lượt chơi
-    f = open("pvp.txt", "w")
-    for row in start_board:
-        s = ""
-        for cell in row:
-            if cell == -1: s = s + str(cell)
-            else: s = s + " " + str(cell)
-        f.write(s)
-    f.close()
+    writeStateFile("test/pvp.txt", start_board)
     # Tạo vòng lặp while, lần lượt người chơi thực hiện lượt đi
     victor = 0
     while victor == 0:
@@ -44,12 +39,8 @@ def main():
         turnOf = turnOf*(-1)
         # Viết file txt kết quả
         nowBoard = master_board.board
-        f = open("pvp.txt", "w")
-        for row in nowBoard:
-            s = ""
-            for cell in row:
-                if cell == -1: s = s + str(cell)
-                else: s = s + " " + str(cell)
-            f.write(s)
-        f.close()
+        writeStateFile("test/pvp.txt", nowBoard)
     print("End of game, the victor is " + str(victor))
+
+if __name__ == "__main__":
+    main()

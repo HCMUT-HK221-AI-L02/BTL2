@@ -3,16 +3,17 @@
 # Có thủ tục tạo object
 
 from app.legalmove import *
-from app.positionstep import *
 from app.piece import *
+from app.utils import *
 
-class BoardState:
 
-    # Khởi tạo obj boardState nếu cần, có chứa danh sách các piece và placement
+class State:
+
+    # Khởi tạo obj State nếu cần, có chứa danh sách các piece và placement
     # Nhập vào board từ move để khởi tạo
     def __init__(self, prev_board: list, board: list):
-        self.prev_board = prev_board
-        self.board = board
+        self.prev_board = copyBoard(prev_board)
+        self.board = copyBoard(board)
         self.pieceList = []
         self.boardPlacement = []
         self.trapMoveList = []
@@ -28,10 +29,11 @@ class BoardState:
     def createPieceListAndBoardPlacement(self):
         # Tạo list mới
         newPieceList = []
-        newBoardPlacement = [[],[],[],[],[]]
+        newBoardPlacement = []
         # Duyệt qua board
-        for boardRow in self.board:
-            for boardColumn in boardRow:
+        for boardRow in range(5):
+            newBoardPlacementRow = []
+            for boardColumn in range(5):
                 # Nếu ô board đang xét có chứa piece thì tạo piece và thêm vào list
                 newPiece = None
                 if self.board[boardRow][boardColumn] != 0:
@@ -39,7 +41,8 @@ class BoardState:
                     newPiece = Piece(self.board[boardRow][boardColumn], pos)
                     newPieceList.append(newPiece)
                 # Đặt piece vào trong boardPlacement
-                newBoardPlacement[boardRow].append(newPiece)
+                newBoardPlacementRow.append(newPiece)
+            newBoardPlacement.append(newBoardPlacementRow)
         # Gán kết quả thu được
         self.pieceList = newPieceList
         self.boardPlacement = newBoardPlacement
@@ -75,7 +78,7 @@ class BoardState:
         
 
     # Hàm update lại board của state
-    def updateBoard(self):
+    def updateBoard(self):        
         for i in range(5):
             for j in range(5):
                 if self.boardPlacement[i][j] == None: self.board[i][j] = 0
@@ -114,7 +117,7 @@ class BoardState:
     # Định nghĩa hàm di chuyển một quân cờ trong board này
     def boardMove(self, moveTupple):
         # Backup lại prev_move
-        self.prev_board = self.board
+        self.prev_board = copyBoard(self.board)
         # Thực hiện lấy piece
         startTuple = moveTupple[0]        
         piece = self.boardPlacement[startTuple[0]][startTuple[1]]
@@ -124,14 +127,14 @@ class BoardState:
         self.boardPlacement[startTuple[0]][startTuple[1]] = None
         # Cập nhật vị trí mới của quân cờ vừa đi
         piece.movePiece(endTuple)
+        # update posiblemove
+        self.updatePosibleMove()
         # Thực hiện thay đổi màu do gánh
         self.ganh(endTuple)
         # Thực hiện thay đổi màu do vây
-        self.vay()
+        self.vay(endTuple)
         # Cập nhật board
         self.updateBoard()
-        # update posiblemove
-        self.updatePosibleMove()  
         # Kiểm tra người chiến thắng
         self.victorCHK()
 
@@ -165,21 +168,66 @@ class BoardState:
             moveTupple = (position, pos2)
             if legalMoveChk(moveTupple) == False: continue
             # Kiểm tra xem nếu không có đủ 2 quân cờ đối xứng thì skip
+            if self.boardPlacement[pos1[0]][pos1[1]] == None: continue
+            if self.boardPlacement[pos2[0]][pos2[1]] == None: continue
             if self.boardPlacement[pos1[0]][pos1[1]].team != enemy: continue
             if self.boardPlacement[pos2[0]][pos2[1]].team != enemy: continue
             # Thêm 2 quân cờ trên vào trong danh sách đổi team
             toChange.append(self.boardPlacement[pos1[0]][pos1[1]])
             toChange.append(self.boardPlacement[pos2[0]][pos2[1]])
         # Đổi team các quân cờ trong list
-        if len(toChange) == 0: return False
-        else: 
-            for piece in toChange: piece.changeTeam()
-            return True
+        return changeTeamList(toChange)
 
 
 
     # Định nghĩa hàm kiểm tra việc vây quân cờ
-    def vay(self):
-        # Duyệt qua toàn bộ board, xem quân nào bị vây
-        # Trả ra danh sách quân cờ bị đổi màu
-        return
+    def vay(self, position) -> bool:
+        # Tạo list để phân nhóm quân cờ, team mình thì đánh số 1 hết
+        anyChange = False
+        enemyTeam = self.boardPlacement[position[0]][position[1]].team * (-1)
+        L1 = []
+        pieceChk = []
+        for piece in self.pieceList: 
+            if piece.team == enemyTeam: pieceChk.append(False)
+            else: pieceChk.append(True)
+        # Duyệt qua các quân cờ trên bàn để phân nhóm
+        for i in range(len(self.pieceList)):
+            # Kiểm tra xem piece có trong list nào trong L1 chưa
+            if pieceChk[i] == True: continue
+            # Kiểm tra xem piece này thêm vào được list con nào trong L1 không
+            inL2 = False
+            for L2 in L1:
+                # Duyệt qua từng pp trong L2
+                for pp in L2:
+                    # Lấy ra list legal move
+                    legalMoveList = LEGALMOVE[pp.pos[0]][pp.pos[1]]
+                    # Lấy ra list vị trí cần xét
+                    legalNextPos = []
+                    for move in legalMoveList: legalNextPos.append(move[1])
+                    # Lấy ra piece nằm trong legalNextPos
+                    ppNextList = []
+                    for pos in legalNextPos:
+                        if self.boardPlacement[pos[0]][pos[1]] != None:
+                            ppNextList.append(self.boardPlacement[pos[0]][pos[1]])
+                    # Nếu piece i nằm trong ppNextList thì báo rằng có thể thêm vào L2
+                    if self.pieceList[i] in ppNextList: inL2 = True
+                    if inL2 == True: break
+                # Nếu được báo là có thể thêm vào L2 thì add vào L2 rồi break
+                if inL2 == True:
+                    L2.append(self.pieceList[i])  
+                    pieceChk[i] = True       
+                    break
+            # Nếu piece i không nằm trong L2 nào đó thì tạo một L2 mới
+            if inL2 == False: 
+                L1.append([self.pieceList[i]])
+                pieceChk[i] = True
+        # Duyệt qua danh sách phân nhóm L1
+        for L2 in L1:
+            # Đếm số bước đi có thể thực hiện của L2
+            totalPosibleMove = 0
+            for piece in L2: totalPosibleMove += len(piece.posibleMove)
+            # Nếu nhóm L2 không còn nước đi thì đổi màu cả nhóm
+            if totalPosibleMove == 0: 
+                changeTeamList(L2)
+                anyChange = True
+        return anyChange

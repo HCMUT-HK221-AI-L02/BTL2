@@ -36,7 +36,7 @@ LEGALMOVE = [
         [((2, 2), (1, 1)), ((2, 2), (1, 2)), ((2, 2), (1, 3)), ((2, 2), (2, 1)), ((2, 2), (2, 3)), ((2, 2), (3, 1)), ((2, 2), (3, 2)), ((2, 2), (3, 3))],
         # 3: U,L,R,D
         [((2, 3), (1, 3)), ((2, 3), (2, 2)), ((2, 3), (2, 4)), ((2, 3), (3, 3))],
-        # 4: LU,U,L,RD,D
+        # 4: LU,U,L,LD,D
         [((2, 4), (1, 3)), ((2, 4), (1, 4)), ((2, 4), (2, 3)), ((2, 4), (3, 3)), ((2, 4), (3, 4))]
     ],
     # Hàng 3
@@ -58,14 +58,27 @@ LEGALMOVE = [
         [((4, 0), (3, 0)), ((4, 0), (3, 1)), ((4, 0), (4, 1))],
         # 1: U,L,R
         [((4, 1), (3, 1)), ((4, 1), (4, 0)), ((4, 1), (4, 2))],
-        # 2: RU,U,LU,L,R
-        [((4, 2), (3, 3)), ((4, 2), (3, 2)), ((4, 2), (3, 1)), ((4, 2), (4, 1)), ((4, 2), (4, 3))],
+        # 2: LU,U,RU,L,R
+        [((4, 2), (3, 1)), ((4, 2), (3, 2)), ((4, 2), (3, 3)), ((4, 2), (4, 1)), ((4, 2), (4, 3))],
         # 3: U,L,R
         [((4, 3), (3, 3)), ((4, 3), (4, 2)), ((4, 3), (4, 4))],
-        # 4: RU,U,L
-        [((4, 4), (3, 5)), ((4, 4), (3, 4)), ((4, 4), (4, 3))]
+        # 4: LU,U,L
+        [((4, 4), (3, 3)), ((4, 4), (3, 4)), ((4, 4), (4, 3))]
     ]
 ]
+
+
+POSITIONSTEP = [
+    (-1,-1),
+    (-1,0),
+    (-1,1),
+    (0,-1),
+    (0,1),
+    (1,-1),
+    (1,0),
+    (1,1)
+]
+
 
 # Hàm kiểm tra một move có legal hay không
 def legalMoveChk(moveTupple: tuple) -> bool:
@@ -74,5 +87,5 @@ def legalMoveChk(moveTupple: tuple) -> bool:
     # Lấy ra danh sách legal move tại tọa độ bắt đầu
     legalMoveList = LEGALMOVE[startTuple[0]][startTuple[1]]
     # Kiểm tra xem moveTupple có nằm trong list hay không
-    if legalMoveList.count(moveTupple) != 0: return True
+    if moveTupple in legalMoveList: return True
     else: return False

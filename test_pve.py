@@ -2,7 +2,7 @@
 # Nếu một moveTupple không hợp lệ thì bắt chọn lại moveTupple
 
 # Import thư viện và hàm
-from app.boardstate import *
+from app.state import *
 
 def main():
     # Khởi tạo bàn cờ đầu tiên
@@ -11,7 +11,7 @@ def main():
                     [1, 0, 0, 0, -1],
                     [-1, 0, 0, 0, -1],
                     [-1, -1, -1, -1, -1]]
-    master_board = BoardState(start_board)
+    master_board = State(start_board)
     # Chọn ai đi trước và ai là 'X' hoặc 'O'
         # Yêu cầu nhập xem ai là 'X' hoặc 'O'
         # Yêu cầu nhập xem ai đi trước
