@@ -58,39 +58,29 @@ class State:
         foundMove = False
         for i in range(5):
             for j in range(5):
-                if self.prev_board[i][j] == 0:
-                    if self.board[i][j] != 0:
-                        pos = (i,j)
+                if self.prev_board[i][j] != 0:
+                    if self.board[i][j] == 0:
+                        pp = (i,j)
                         foundMove = True
                         break
             if foundMove: break
-        trapOf = self.board[i][j]
-        beingTrap = trapOf * (-1)
-        # Xác định list legal move đì từ vị trí này
-        legalMoveFromPos: list = LEGALMOVE[pos[0]][pos[1]]
-        # Liệt kê posible position
-        posiblePos = []
-        for move in legalMoveFromPos: 
+        beingTrap = self.prev_board[i][j] * (-1)
+        # Lấy danh sách legalMove từ vị trí pp
+        legalMoveFromPP: list = LEGALMOVE[pp[0]][pp[1]]
+        # Lấy danh sách đối tượng bị trap từ legalMoveFromPP
+        posibleBeingTrap = []
+        for move in legalMoveFromPP:
             des = move[1]
-            if self.board[des[0]][des[1]] == 0: posiblePos.append(des)
-        # Duyệt qua các pp của danh sách posiblePos
-        for pp in posiblePos:
-            # Lấy danh sách legalMove từ vị trí pp
-            legalMoveFromPP: list = LEGALMOVE[pp[0]][pp[1]]
-            # Lấy danh sách đối tượng bị trap từ legalMoveFromPP
-            posibleBeingTrap = []
-            for move in legalMoveFromPP:
-                des = move[1]
-                if self.board[des[0]][des[1]] == beingTrap: posibleBeingTrap.append(des)
-            # Với mỗi cell bị trap, tạo state đệm
-            for trapedPos in posibleBeingTrap:
-                tState = State(None, self.board)
-                # Đi thử move bị ép đi
-                moveTuple = (trapedPos, pp)
-                endTuple = tState.boardMovePiece(moveTuple)
-                # Nếu move bị ép đi có xảy ra gánh thì thêm vào trong trapmove
-                isLegitTrap = tState.ganh(endTuple)
-                if isLegitTrap == True: self.trapMoveList.append(moveTuple)
+            if self.board[des[0]][des[1]] == beingTrap: posibleBeingTrap.append(des)
+        # Với mỗi cell bị trap, tạo state đệm
+        for trapedPos in posibleBeingTrap:
+            tState = State(None, self.board)
+            # Đi thử move bị ép đi
+            moveTuple = (trapedPos, pp)
+            endTuple = tState.boardMovePiece(moveTuple)
+            # Nếu move bị ép đi có xảy ra gánh thì thêm vào trong trapmove
+            isLegitTrap = tState.ganh(endTuple)
+            if isLegitTrap == True: self.trapMoveList.append(moveTuple)
         # Nếu có trapMove thì ghi đè lên posible move
         if len(self.trapMoveList) > 0:
             # Ép tất cả posiblemove của các piece là rỗng
