@@ -6,15 +6,8 @@
 + Các hàm chính được đặt ngoài dir chính.
 + Viết lại tên mình trong phần readme/Nhận viết hàm để mọi người biết mình đang viết hàm nào.
 
-## Nhận viết hàm
-+ Làm kiến trúc, init git: Nhân
-+ Chuẩn bị việc build file cuối cùng để nộp:
 
-## TODO
-+ Hoàn thành nốt kiến trúc (done)
-+ Giải thích các thuật ngữ sử dụng trong code (process)
-+ Hoàn thanh pvp (process)
-+ Cập nhật updatePosibleMove có thế cờ mở
+
 
 ## Giải thích một số thuật ngữ:
 + board và prev_board là array 2D, dùng để nhập vào move
@@ -23,10 +16,6 @@
 + boardState là obj có thể coi là một node trong giải thuật. Mỗi boardState có chứa danh sách các piece riêng của mình. Giữa các boardState KHÔNG DÙNG CHUNG PIECE. Khi copy boardState ra phải tạo piece mới.
 + Trong boardState có piecelist là danh sách các piece trong state, còn boardplacement là array 2D mà mỗi ô trong array trỏ đến 1 quân cờ trong piecelist (có ô sẽ rỗng)
 
-## Log
-### 221130
-+ Khởi tạo Repos, readme.
-+ Thiết kế kiến trúc app.
-### 221206
-+ Hoàn thành thiết kế kiến trúc
-+ Nhân viết các file liên quan pvp
+## Version/Branch
++ Branch "Nhan" đang chứa phiên bản có trapMove theo phương pháp chọn cả 4 ô kế bên đích đến.
++ Branch "Nhan2" sẽ chứa phiên bản trapMove đang sử dụng trong main, chỉ lấy vị trí trapMove đi đến tọa độ vừa được chừa ra.
