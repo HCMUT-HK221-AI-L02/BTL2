@@ -19,9 +19,9 @@ class State:
         self.trapMoveList = []
         self.victor = 0
         self.createPieceListAndBoardPlacement()
-        self.createTrapMoveList()
         self.updatePosibleMove()
-
+        self.updateTrapMoveList()
+        
 
     # Tạo danh sách piece, lưu ý tạo mới piece cho state vì mỗi state sẽ
     # có posibleMove của piece khác nhau
@@ -49,32 +49,78 @@ class State:
 
 
     # Hàm tạo danh sách các trapMove
-    def createTrapMoveList(self):
-        # Liệt kê 4 ô nằm kế bên đích đến của move vừa thực hiện
-        # Liệt kê các nước đi có thể đi đến 4 ô đó MÀ ĐỐI PHƯƠNG THỰC HIỆN ĐƯỢC
-        # Dựa vào danh sách nước đi trên, liệt kê nước đi nào có thể xảy ra gánh
-        # Xuất danh sách thu được
-        return
+    def updateTrapMoveList(self):
+        self.trapMoveList = []
+        # Kiểm tra xem trước đó có hiện tượng ăn quân không, nếu có thì skip trap move
+        if self.prev_board == None: return
+        if countPieceTeam(self.prev_board, 1) != countPieceTeam(self.board, 1): return
+        # Tìm vị trí vừa đi tới thông qua prev_board và board
+        foundMove = False
+        for i in range(5):
+            for j in range(5):
+                if self.prev_board[i][j] == 0:
+                    if self.board[i][j] != 0:
+                        pos = (i,j)
+                        foundMove = True
+                        break
+            if foundMove: break
+        trapOf = self.board[i][j]
+        beingTrap = trapOf * (-1)
+        # Xác định list legal move đì từ vị trí này
+        legalMoveFromPos: list = LEGALMOVE[pos[0]][pos[1]]
+        # Liệt kê posible position
+        posiblePos = []
+        for move in legalMoveFromPos: 
+            des = move[1]
+            if self.board[des[0]][des[1]] == 0: posiblePos.append(des)
+        # Duyệt qua các pp của danh sách posiblePos
+        for pp in posiblePos:
+            # Lấy danh sách legalMove từ vị trí pp
+            legalMoveFromPP: list = LEGALMOVE[pp[0]][pp[1]]
+            # Lấy danh sách đối tượng bị trap từ legalMoveFromPP
+            posibleBeingTrap = []
+            for move in legalMoveFromPP:
+                des = move[1]
+                if self.board[des[0]][des[1]] == beingTrap: posibleBeingTrap.append(des)
+            # Với mỗi cell bị trap, tạo state đệm
+            for trapedPos in posibleBeingTrap:
+                tState = State(None, self.board)
+                # Đi thử move bị ép đi
+                moveTuple = (trapedPos, pp)
+                endTuple = tState.boardMovePiece(moveTuple)
+                # Nếu move bị ép đi có xảy ra gánh thì thêm vào trong trapmove
+                isLegitTrap = tState.ganh(endTuple)
+                if isLegitTrap == True: self.trapMoveList.append(moveTuple)
+        # Nếu có trapMove thì ghi đè lên posible move
+        if len(self.trapMoveList) > 0:
+            # Ép tất cả posiblemove của các piece là rỗng
+            for piece in self.pieceList:
+                posibleMove = []
+                piece.inputPosibleMove(posibleMove)
+            # Duyệt qua danh sách trapMoveList
+            for move in self.trapMoveList:
+                start = move[0]
+                # Gán move vào trong piece tại start
+                piece = self.boardPlacement[start[0]][start[1]]
+                piece.addPosibleMove(move)
 
 
     # Hàm cập nhật lại posibleMove cho các piece
     # Có xét cả trường hợp bị bẫy nên giảm posiblemove
     def updatePosibleMove(self):
-        # Nếu có trapMove thì làm khác
-        if len(self.trapMoveList) == 0:
-            # Duyệt qua danh sách piece
-            for piece in self.pieceList:
-                posibleMove = []
-                # Copy legal move qua
-                pos = piece.pos
-                legalMove = LEGALMOVE[pos[0]][pos[1]]
-                # Duyệt qua list các legal move
-                for move in legalMove:
-                    # Nếu đích đến không có quân cờ chiếm chỗ thì thêm vào posibleMove
-                    des = move[1]
-                    if self.boardPlacement[des[0]][des[1]] == None: posibleMove.append(move)
-                # Nhập posibleMove vào trong piece
-                piece.inputPosibleMove(posibleMove)
+        # Duyệt qua danh sách piece
+        for piece in self.pieceList:
+            posibleMove = []
+            # Copy legal move qua
+            pos = piece.pos
+            legalMove = LEGALMOVE[pos[0]][pos[1]]
+            # Duyệt qua list các legal move
+            for move in legalMove:
+                # Nếu đích đến không có quân cờ chiếm chỗ thì thêm vào posibleMove
+                des = move[1]
+                if self.boardPlacement[des[0]][des[1]] == None: posibleMove.append(move)
+            # Nhập posibleMove vào trong piece
+            piece.inputPosibleMove(posibleMove)
         
 
     # Hàm update lại board của state
@@ -100,7 +146,6 @@ class State:
         if moveTupple in posibleMove: return True
 
 
-
     def victorCHK(self):
         flag = True
         leadTeam = self.pieceList[0].team
@@ -114,29 +159,46 @@ class State:
         else: return 0
 
 
-    # Định nghĩa hàm di chuyển một quân cờ trong board này
-    def boardMove(self, moveTupple):
+    # Hiện thực hàm chỉ move 1 piece
+    def boardMovePiece(self, moveTupple) -> tuple:
         # Backup lại prev_move
         self.prev_board = copyBoard(self.board)
         # Thực hiện lấy piece
         startTuple = moveTupple[0]        
         piece = self.boardPlacement[startTuple[0]][startTuple[1]]
-        # Cập nhật bàn cờ sau khi di chuyển
+        # Di chuyển quân cờ trên bàn cờ
         endTuple = moveTupple[1]
         self.boardPlacement[endTuple[0]][endTuple[1]] = piece
         self.boardPlacement[startTuple[0]][startTuple[1]] = None
         # Cập nhật vị trí mới của quân cờ vừa đi
         piece.movePiece(endTuple)
-        # update posiblemove
+        # update posiblemove và board
         self.updatePosibleMove()
-        # Thực hiện thay đổi màu do gánh
-        self.ganh(endTuple)
-        # Thực hiện thay đổi màu do vây
-        self.vay(endTuple)
-        # Cập nhật board
         self.updateBoard()
+        # Trả ra endTuple
+        return endTuple
+
+
+    # Định nghĩa hàm di chuyển một quân cờ đồng thời đổi màu do gánh hoặc vây
+    # Kết quả trả ra là return Code:
+    # 0: không có gánh và vây
+    # 1: có gánh
+    # 2: có vây
+    # 3: vừa gánh vừa vây
+    def boardMove(self, moveTupple) -> int:
+        # Thực hiện move một piece trong bàn cờ
+        endTuple = self.boardMovePiece(moveTupple)
+        # Thực hiện thay đổi màu do gánh
+        ganhChk =  self.ganh(endTuple)
+        # Thực hiện thay đổi màu do vây
+        vayChk = self.vay(endTuple)
+        # Cập nhật board, posiblemove và trapmove
+        self.updateBoard()
+        self.updateTrapMoveList()
         # Kiểm tra người chiến thắng
         self.victorCHK()
+        # Trả ra trạng thái có hay không gánh với vây
+        return encodeBoardMoveReturn(ganhChk, vayChk)
 
 
     # Định nghĩa hàm kiểm tra việc gánh quân cờ

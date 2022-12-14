@@ -6,6 +6,9 @@ class Piece:
         # posibleMove là danh sách các tuple, mỗi tuple là một move có thể đi
         self.posibleMove = []
 
+    def addPosibleMove(self, move):
+        self.posibleMove.append(move)
+
     def inputPosibleMove(self, posibleMove: list):
         self.posibleMove = posibleMove
 
