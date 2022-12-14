@@ -7,11 +7,11 @@ from app.state import *
 def main():
     # Khởi tạo bàn cờ đầu tiên
     # 1 là 'O', -1 là 'X', 0 là ô trống.
-    start_board = [[1, 1, 1, 1, 1],
-                    [1, 0, 0, 0, 1],
-                    [1, 0, 0, 0, -1],
-                    [-1, 0, 0, 0, -1],
-                    [-1, -1, -1, -1, -1]]
+    start_board = [[0, 0, 0, 0, 0],
+                    [0, 1, -1, 0, 0],
+                    [0, 1, -1, 0, 0],
+                    [0, 1, -1, 0, 0],
+                    [0, 0, 0, 0, 0]]
     master_state = State(None, start_board)
     # Chọn 'X' đi trước hay 'O' đi trước
     turnOf = 0

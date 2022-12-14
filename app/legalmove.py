@@ -67,7 +67,7 @@ LEGALMOVE = [
     ]
 ]
 
-
+# Gia số thay đổi vị trí từ một position, Theo thứ tự LU,U,RU,L,R,LD,D,RD
 POSITIONSTEP = [
     (-1,-1),
     (-1,0),
