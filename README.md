@@ -5,6 +5,8 @@
 + Các hàm cần sử dụng được đặt trong folder app.
 + Các hàm chính được đặt ngoài dir chính.
 + Viết lại tên mình trong phần readme/Nhận viết hàm để mọi người biết mình đang viết hàm nào.
++ Lý thuyết Monte Carlo Search Tree:
+https://int8.io/monte-carlo-tree-search-beginners-guide/?fbclid=IwAR0eFegd3TK9chrbnpCoMkrUGwPpXvlJvw17yfv-IemFeXYONBTyC4WYQ_0
 
 
 

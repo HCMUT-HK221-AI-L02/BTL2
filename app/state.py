@@ -8,7 +8,6 @@ from app.utils import *
 
 
 class State:
-
     # Khởi tạo obj State nếu cần, có chứa danh sách các piece và placement
     # Nhập vào board từ move để khởi tạo
     def __init__(self, prev_board: list, board: list):
@@ -99,6 +98,7 @@ class State:
     # Có xét cả trường hợp bị bẫy nên giảm posiblemove
     def updatePosibleMove(self):
         # Duyệt qua danh sách piece
+        piece: Piece
         for piece in self.pieceList:
             posibleMove = []
             # Copy legal move qua
@@ -231,7 +231,6 @@ class State:
         return changeTeamList(toChange)
 
 
-
     # Định nghĩa hàm kiểm tra việc vây quân cờ
     def vay(self, position) -> bool:
         # Tạo list để phân nhóm quân cờ, team mình thì đánh số 1 hết
@@ -277,9 +276,20 @@ class State:
         for L2 in L1:
             # Đếm số bước đi có thể thực hiện của L2
             totalPosibleMove = 0
+            piece: Piece
             for piece in L2: totalPosibleMove += len(piece.posibleMove)
             # Nếu nhóm L2 không còn nước đi thì đổi màu cả nhóm
             if totalPosibleMove == 0: 
                 changeTeamList(L2)
                 anyChange = True
         return anyChange
+
+
+    # Định nghĩa hàm đếm tổng số posibleMove của một phe
+    def posibleMoveListTeam(self, team):
+        posibleMoveListTeam = []
+        piece: Piece
+        for piece in self.pieceList:
+            if piece.team != team: continue
+            for move in piece.posibleMove: posibleMoveListTeam.append(move)
+        return posibleMoveListTeam
