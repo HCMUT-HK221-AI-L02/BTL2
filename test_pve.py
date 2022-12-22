@@ -21,8 +21,8 @@ def main():
     turn = int(input("Who go first (1_(O) | -1_(X)) ?"))
     # Set thời gian cho người chơi
     remain_time = {
-        "remain_time_x": 1000,
-        "remain_time_o": 1000
+        "remain_time_x": 20000,
+        "remain_time_o": 20000
     }
 
     while True:
@@ -36,14 +36,14 @@ def main():
                 printCanPickPiece(master_board, turn)
                 startString = input("Input position of picked piece: ")
                 startTuple = eval(startString)
-                if printCanPickDes(master_board, startTuple): continue
+                if printCanPickDes(master_board, startTuple) == False: continue
                 endString = input("Input position of destination: ")
                 #End user Time
                 e_user_time = time.time()
                 endTuple = eval(endString)
                 moveTuple = (startTuple, endTuple)
-                if master_board.boardMoveChk(moveTuple, side): 
-                    isPossibleMove = True
+                if master_board.boardMoveChk(moveTuple, side) == False: continue 
+                else: isPossibleMove = True
             # Giảm thời gian chơi của user
             if side == 1:
                 remain_time["remain_time_x"] -= s_user_time - e_user_time
@@ -56,26 +56,33 @@ def main():
             # piece = random.choice(master_board.pieceList)
             # # Random move in pieceList.possibleMove
             # moveTuple = random.choice(piece.posibleMove)
-            moveTuple = move(master_board.prev_board, master_board.board, turn, remain_time["remain_time_x"], remain_time["remain_time_o"])
-            return
+            s_com_time = time.time()
+            moveTuple = move(master_board.prev_board, master_board.board, side*(-1), remain_time["remain_time_x"], remain_time["remain_time_o"])
+            e_com_time = time.time()
+            print("Computer decision time: ", e_com_time - s_com_time)
+            print("Computer make move: ", moveTuple)
         master_board.boardMove(moveTuple)
+
         # Kiểm tra thời gian còn lại của X và O
         if remain_time["remain_time_x"] <= 0:
             print("End of game, player X is out of time!")
         elif remain_time["remain_time_o"] <= 0:
             print("End of game, player Y is out of time!")
+
+        # Viết file txt kết quả:
+        nowBoard = master_board.board
+        writeStateFile("test/pve.txt", nowBoard)
+
+        # In kết quả ra terminal:
+        printState(nowBoard)
+
         # Kiểm tra thắng cuộc
         if master_board.victor:
             print("End of game, the victory is " + str(side))
             break
         turn *= -1
-        # Yêu cầu nhập xem ai đi trước
-    # Tạo vòng lặp while, lần lượt người chơi thực hiện lượt đi
-        # Nếu là Máy, gọi hàm move, trả ra tuple
-        # Nếu là Human:
-            # Nhập vào terminal tuple
-            # Kiểm tra nước đi hợp lệ
-            # Trả ra tuple move kết quả
-        # Nhập move vào trong master_board, trả kết quả ra là board và prev_board
-        # Phân biệt thắng thua hoặc đi tiếp, đổi lượt
     return
+
+
+if __name__ == "__main__":
+    main()

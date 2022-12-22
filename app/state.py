@@ -20,6 +20,7 @@ class State:
         self.createPieceListAndBoardPlacement()
         self.updatePosibleMove()
         self.updateTrapMoveList()
+        self.victorCHK()
         
 
     # Tạo danh sách piece, lưu ý tạo mới piece cho state vì mỗi state sẽ
@@ -134,6 +135,7 @@ class State:
         posibleMove = piece.posibleMove
         if len(posibleMove) == 0: return False
         if moveTupple in posibleMove: return True
+        else: return False
 
 
     def victorCHK(self):
@@ -293,3 +295,16 @@ class State:
             if piece.team != team: continue
             for move in piece.posibleMove: posibleMoveListTeam.append(move)
         return posibleMoveListTeam
+
+
+    # Định nghĩa hàm xác định phe có lợi thế
+    def advantageTeam(self):
+        countTeam1 = 0
+        countTeam2 = 0
+        piece: Piece
+        for piece in self.pieceList:
+            if piece.team == 1: countTeam1 += 1
+            else: countTeam2 += 1
+        if countTeam1 > countTeam2: return 1
+        elif countTeam1 == countTeam2: return 0
+        else: return -1

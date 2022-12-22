@@ -22,7 +22,6 @@ def writeStateFile(path, board):
     f.write("\n")
     f.write("---------------------------")
     f.write("\n")
-    # f.write("   -1    0    0    0   -1")
     for row in range(5):
         f.write(str(row) + "|")
         s = ""
@@ -34,6 +33,19 @@ def writeStateFile(path, board):
         f.write(" |")
         f.write("\n")
     f.close()
+
+
+# Định nghĩa hàm viết ra terminal kết quả
+def printState(board):
+    print("      0    1    2    3    4")
+    print("---------------------------")
+    for row in range(5):
+        s = ""
+        for cell in board[row]:
+            if cell == -1: s = s + "   " + str(cell)
+            else: s = s + "    " + str(cell)
+        print(str(row) + "|" + s)
+        print(" |")
 
 
 # Đếm số lượng quân cờ trong một team
