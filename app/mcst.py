@@ -116,7 +116,6 @@ def monte_carlo_tree_search(root: Node, remain_time):
     # Xác định thời gian còn lại
     remain_time_byTurn = min(MCST_THINK_TIME_PER_TURN, remain_time)
     d_time = 0
-    simuCount = 0
     while resources_left(remain_time_byTurn, d_time):
         s_time = time.time()
         leaf = transverse(root)
@@ -126,8 +125,10 @@ def monte_carlo_tree_search(root: Node, remain_time):
         e_time = time.time()
         d_time = e_time - s_time
         remain_time_byTurn -= d_time
-        simuCount += 1
-    print("Number of thinking: ", simuCount)
+    return best_child(root)
+
+
+# Hàm in kết quả (Q, N) để debug
+def printQN(root: Node):
     node: Node
     for node in root.next: print("(Q, N) = (", node.Q, ", ", node.N,")")
-    return best_child(root)
