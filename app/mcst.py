@@ -2,7 +2,12 @@
 from app.state import State
 from math import log, sqrt
 from random import choice
-UCT_CONST = 0.5
+import time
+UCT_CONST = 2
+# MCST_SIMU_DEEP = 10                     # Chấm offline
+MCST_SIMU_DEEP = 5                      # Chấm eln
+# MCST_THINK_TIME_PER_TURN = 1.9          # Chấm offline
+MCST_THINK_TIME_PER_TURN = 0.027        # Chấm eln
 
 
 # Định nghĩa class node
@@ -21,8 +26,9 @@ class Node:
 
 
 # Viết các hàm của thuật toán MCST
-def resources_left(remain_time_x, remain_time_o):
-    return True
+def resources_left(remain_time_byTurn, d_time):
+    if remain_time_byTurn > d_time: return True
+    else: return False
 
 
 def transverse(root: Node):
@@ -36,6 +42,8 @@ def transverse(root: Node):
             leafState.boardMove(move)
             leaf = Node(leafState, root.turnOf * (-1), root, move)
             root.next.append(leaf)
+    # Nếu sau khi đã tạo lá mà vẫn không có lá thì trả kết quả là node hiện tại
+    if len(root.next) == 0: return root
     # Nếu có lá thì lấy lá chưa được duyệt
     child: Node
     for child in root.next:
@@ -51,10 +59,10 @@ def transverse(root: Node):
 
 
 def backpropagate(node: Node, simulation_result):
-    if node.parent == None: return 
     node.Q += simulation_result[0]
     node.N += simulation_result[1]
-    backpropagate(node.parent)
+    if node.parent == None: return 
+    backpropagate(node.parent, simulation_result)
 
 
 def best_child(root: Node):
@@ -66,8 +74,9 @@ def best_child(root: Node):
     return root.next[idxBest]
 
 
-def non_terminal(state: State):
-    if state.victor == 0: return True
+def non_terminal(state: State, countRollout):
+    if state.victor != 0: return False
+    if countRollout < MCST_SIMU_DEEP: return True
     else: return False
 
 
@@ -79,9 +88,12 @@ def rollout_policy(state: State, turnOf):
 
 # Hàm trả ra kết quả rollout
 def result(state: State):
-    if state.victor == Node.player: return (1, 1)
-    elif state.victor == 0: return (0,1)
-    elif state.victor == Node.player * (-1): return (-1, 1)
+    # Tìm phe có lợi thế
+    winner = state.advantageTeam()
+    # Trả kết quả có dạng (Q, N), nếu Node.player thắng thì Q = 1
+    if winner == Node.player: return (1,1)
+    elif winner == Node.player*(-1): return (-1,1)
+    else: return (0,1)
 
 
 def rollout(node: Node):
@@ -89,19 +101,33 @@ def rollout(node: Node):
     nodeState: State = node.state
     tState = State(nodeState.prev_board, nodeState.board)
     turnOf = node.turnOf
+    countRollout = 0
     # Khi còn trong điều kiện giá lập thì cho tState thực hiện bước đi
-    while non_terminal(tState):
+    while non_terminal(tState, countRollout):
         moveTupple = rollout_policy(tState, turnOf)
         tState.boardMove(moveTupple)
         turnOf *= (-1)
+        countRollout += 1
     # Trả ra kết quả
     return result(tState)
 
 
-def monte_carlo_tree_search(root, remain_time_x, remain_time_o):
-    while resources_left(remain_time_x, remain_time_o):
+def monte_carlo_tree_search(root: Node, remain_time):
+    # Xác định thời gian còn lại
+    remain_time_byTurn = min(MCST_THINK_TIME_PER_TURN, remain_time)
+    d_time = 0
+    simuCount = 0
+    while resources_left(remain_time_byTurn, d_time):
+        s_time = time.time()
         leaf = transverse(root)
         # Mô phỏng kết leaf, kết quả là Tuple (Q, N)
         simulation_result = rollout(leaf)
         backpropagate(leaf, simulation_result)
+        e_time = time.time()
+        d_time = e_time - s_time
+        remain_time_byTurn -= d_time
+        simuCount += 1
+    print("Number of thinking: ", simuCount)
+    node: Node
+    for node in root.next: print("(Q, N) = (", node.Q, ", ", node.N,")")
     return best_child(root)
