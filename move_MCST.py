@@ -16,4 +16,5 @@ def move(prev_board, board, player, remain_time_x, remain_time_o):
     # In ra terminal (Q, N) nếu cần debug (COMMENT HÀNG NÀY NẾU KO MUỐN HÀM MOVE IN RA TERMINAL)
     printQN(root)
     # xuất move được chọn ra
-    return ansLeaf.fromMove
+    if ansLeaf == None: return None
+    else: return ansLeaf.fromMove
