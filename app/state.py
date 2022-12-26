@@ -153,6 +153,8 @@ class State:
 
     # Hiện thực hàm chỉ move 1 piece
     def boardMovePiece(self, moveTupple) -> tuple:
+        # Nếu moveTuplle là None thì không làm gì cả
+        if moveTupple == None: return None
         # Backup lại prev_move
         self.prev_board = copyBoard(self.board)
         # Thực hiện lấy piece
@@ -178,6 +180,8 @@ class State:
     # 2: có vây
     # 3: vừa gánh vừa vây
     def boardMove(self, moveTupple) -> int:
+        # Nếu moveTupple là rỗng thì trả kết quả ngay:
+        if moveTupple == None: return encodeBoardMoveReturn(False, False)
         # Thực hiện move một piece trong bàn cờ
         endTuple = self.boardMovePiece(moveTupple)
         # Thực hiện thay đổi màu do gánh

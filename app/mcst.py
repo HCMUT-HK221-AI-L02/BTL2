@@ -66,6 +66,8 @@ def backpropagate(node: Node, simulation_result):
 
 
 def best_child(root: Node):
+    # Nếu root không có child nào thì trả kết quả là None
+    if len(root.next) == 0: return None
     # Chọn child có số lần được chọn nhiều nhất
     child: Node
     NList = []
