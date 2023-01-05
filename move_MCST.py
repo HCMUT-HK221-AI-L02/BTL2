@@ -14,7 +14,7 @@ def move(prev_board, board, player, remain_time_x, remain_time_o):
     ansLeaf: Node
     ansLeaf = monte_carlo_tree_search(root, remain_time)
     # In ra terminal (Q, N) nếu cần debug (COMMENT HÀNG NÀY NẾU KO MUỐN HÀM MOVE IN RA TERMINAL)
-    printQN(root)
+    # printQN(root)
     # xuất move được chọn ra
     if ansLeaf == None: return None
     else: return ansLeaf.fromMove
