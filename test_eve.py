@@ -81,6 +81,7 @@ def main():
                 print("End of game, the victory is MCST!")
             else:
                 print("End of game, the victory is Random!")
+            break
 
         print(remain_move)
         printState(nowBoard)
