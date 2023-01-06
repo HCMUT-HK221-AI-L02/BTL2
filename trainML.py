@@ -1,21 +1,28 @@
 from tensorflow import keras
 import json
+import numpy as np
 from app.ml_model import initModel
 from app.legalmove import LEGALMOVE
 from app.utils import xMove_to_xModel, yMove_to_yModel, list_to_tuple
+TRAINDATAFILE = 'traindata/data00.json'
+TRAIN_FROM_CHECKPOINT = False
+CHECKPOINT_FILE = ''
+CHECKPOINT_SAVE = 'weights/my_model_weights.h5'
 
-
-
-
+# ------ Tạo model
 model = initModel()
 model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
+              loss='categorical_crossentropy',
               metrics=['accuracy'])
+
+# ------ Nhập Checkpoint
+if TRAIN_FROM_CHECKPOINT:
+    model.load_weights(CHECKPOINT_FILE)
 
 
 # ------ Lấy data huấn luyện
 # --- Đọc file
-fileName = 'traindata/data00.json'
+fileName = TRAINDATAFILE
 file = open(fileName, 'r')
 fileData = json.load(file)
 trainData = fileData["train_details"]
@@ -28,16 +35,13 @@ for data in trainData:
     y = yMove_to_yModel(moveTuple)
     x_train.append(x)
     y_train.append(y)
-
-# ------ Kiểm tra chiều dữ liệu
-print(len(x_train))
-print(len(y_train))
+x_train = np.array(x_train)
+y_train = np.array(y_train)
 
 
 # ------ Thực hiện huấn luyện
 model.fit(x_train, y_train, epochs = 10)
 
 
-
 # ------ Lưu lại weights
-model.save_weights('weights/my_model_weights.h5')
+model.save_weights(CHECKPOINT_SAVE)

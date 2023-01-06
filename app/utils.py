@@ -163,5 +163,5 @@ def yModel_to_yMove(yModel: list, posibleMove: list) -> tuple:
             if yModel[i] > maxValue:
                 maxValue = yModel[i]
                 pickIdx = i
-    if pickIdx != -1: return None
+    if pickIdx == -1: return None
     else: return idx_to_moveTuple(pickIdx)

@@ -1,15 +1,10 @@
 # import thư viện
+import numpy as np
 from app.ml_model import *
 from app.state import State
+from app.utils import xMove_to_xModel, yModel_to_yMove
+CHECKPOINT_FILE = 'weights/my_model_weights.h5'
 
-# Hàm dịch outputModel thành moveTuple
-def toMoveTuple(outputModel, posibleMoveList):
-    # Lấy ra index và xác suất của posibleMove
-    # Lấy ra index của move có xác suất lớn nhất
-    # Dịch index này thành moveTuple
-    # Trả kết quả
-    ans = tuple()
-    return ans
 
 # Định nghĩa hàm move đưa ra kết quả dựa trân model FNN đã train
 def move(prev_board, board, player, remain_time_x, remain_time_o):
@@ -18,15 +13,16 @@ def move(prev_board, board, player, remain_time_x, remain_time_o):
     posibleMoveList = rootState.posibleMoveListTeam(player)
     # Tạo model và đọc vào weight đã train
     model = initModel()
-    model.load_weights('weights/my_model_weights.h5')
+    model.load_weights(CHECKPOINT_FILE)
     # Đổi input của move thành input của model
-    inputVector = []
-    inputVector.append(player)
-    for row in board:
-        for cell in row: inputVector.append(cell)
+    x = xMove_to_xModel(player, board)
+    x = np.array(x)
+    x = np.expand_dims(x, axis = 0)
     # Nhập input vào model
-    outputModel = model.predict(inputVector)
+    y = model.predict(x)
+    y = y.tolist()
+    y = y[0]
     # Đổi output của model thành output của hàm move
-    ansMoveTuple = toMoveTuple(outputModel, posibleMoveList)
+    ansMoveTuple = yModel_to_yMove(y, posibleMoveList)
     # xuất move được chọn ra
     return ansMoveTuple
