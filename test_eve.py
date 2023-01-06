@@ -14,21 +14,30 @@ def main():
                     [-1, -1, -1, -1, -1]]
     master_board = State(None, start_board)
 
-    # MCST là 'X' (-1) và random 'O' (1)
+    # Chọn MCST là 'X' (-1) hoặc 'O' (1)
+    side = int(input("Input MCST side, 1 or -1: "))
+    # Chọn bên đi trước  
     turn = int(input("Who go first (1_(O) | -1_(X)) ?"))
 
     remain_time = {
         "remain_time_x": 20000,
         "remain_time_o": 20000
     }
+    
+    remain_move = {
+        "remain_move_x": 50,
+        "remain_move_o": 50
+    }
+
+    outOfMove = False
 
     while True:
-        #MCST X(-1) Turn
-        if turn == -1:
+        #MCST Turn
+        if turn == side:
             # Hiện tại đang gọi hàm move, sẽ thay bằng hàm train MCST sau khi define xong
             moveTuple = move(master_board.prev_board, master_board.board, turn, remain_time["remain_time_x"], remain_time["remain_time_o"])
-
-        #Random O(1) Turn
+            
+        #Random Turn
         else:
             # Lấy list các quân cờ thuộc phe Random
             validPiece = []
@@ -41,14 +50,41 @@ def main():
 
         print(moveTuple)
         master_board.boardMove(moveTuple)
+
+        #Giảm remain_move
+        if turn == 1:
+            remain_move["remain_move_o"] -= 1
+        else:
+            remain_move["remain_move_x"] -= 1
+
         # Viết file txt kết quả:
         nowBoard = master_board.board
         writeStateFile("test/eve.txt", nowBoard)
         # Kiểm tra thắng cuộc
         if master_board.victor:
-            side = "MCST" if turn == -1 else "Random"
-            print("End of game, the victory is " + str(side))
+            win_side = "MCST" if turn == side else "Random"
+            print("End of game, the victory is " + str(win_side))
+            printState(nowBoard)
             break
+        if remain_move["remain_move_x"] == 0:
+            print("End of game, player X is out of moves!")
+            outOfMove = True
+
+        elif remain_move["remain_move_o"] == 0:
+            print("End of game, player O is out of moves!")
+            outOfMove = True
+            
+        if outOfMove:
+            if master_board.advantageTeam() == 0:
+                print("Hòa!!!")
+            elif master_board.advantageTeam() == side:
+                print("End of game, the victory is MCST!")
+            else:
+                print("End of game, the victory is Random!")
+
+        print(remain_move)
+        printState(nowBoard)
+
         turn *= -1
     return 
 
