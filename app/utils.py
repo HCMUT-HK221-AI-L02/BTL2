@@ -94,3 +94,74 @@ def printCanPickDes(state, pos) -> bool:
         for move in piece.posibleMove: posibleDes.append(move[1])
         print("List of posible destination: ", posibleDes)
         return True
+
+
+# --- Hàm hỗ trợ làm model Machine Learning
+# Hàm dịch tupleMove đang ở dạng list về dạng tuple
+def list_to_tuple(a: list) -> tuple:
+    a[0] = tuple(a[0])
+    a[1] = tuple(a[1])
+    b = tuple(a)
+    return b
+
+
+# Hàm dịch moveTuple thành idx
+def moveTuple_to_idx(moveTuple: tuple):
+    from app.legalmove import LEGALMOVE
+    idx = 0
+    for row in LEGALMOVE:
+        for col in row:
+            for cell in col:
+                if cell == moveTuple: return idx
+                idx += 1
+    return -1
+
+
+# Hàm dịch idx thành moveTuple
+def idx_to_moveTuple(idxFind) -> tuple:
+    if idxFind == -1: return None
+    from app.legalmove import LEGALMOVE
+    idx = 0
+    for row in LEGALMOVE:
+        for col in row:
+            for cell in col:
+                if idxFind == idx: return cell
+                idx += 1
+    return None
+
+
+# Hàm đổi x của hàm move thành x của model ML
+def xMove_to_xModel(player, board: list) -> list:
+    inputVector = []
+    inputVector.append(player)
+    for row in board:
+        for cell in row: inputVector.append(cell)
+    return inputVector
+
+
+# Hàm đổi y của hàm move thành y của model ML
+def yMove_to_yModel(moveTuple: tuple) -> list:    
+    from app.legalmove import LEGALMOVE
+    yModel = [0 for i in range(112)]
+    idx = moveTuple_to_idx(moveTuple)
+    yModel[idx] = 1
+    return yModel
+
+
+# Hàm đổi y của model ML thành y của hàm move
+def yModel_to_yMove(yModel: list, posibleMove: list) -> tuple:
+    # Lấy ra idx của posibleMove
+    posibleIdx = []
+    for moveTuple in posibleMove:
+        idx = moveTuple_to_idx(moveTuple)
+        posibleIdx.append(idx)
+    # Duyệt qua yModel, lấy ra y lớn nhất và là posible
+    maxValue = 0
+    pickIdx = -1
+    for i in range(112):
+        if i in posibleIdx:
+            if yModel[i] > maxValue:
+                maxValue = yModel[i]
+                pickIdx = i
+    if pickIdx == -1: return None
+    else: return idx_to_moveTuple(pickIdx)
