@@ -4,10 +4,10 @@ from math import log, sqrt
 from random import choice
 import time
 UCT_CONST = 2
-# MCST_SIMU_DEEP = 10                     # Chấm offline
-MCST_SIMU_DEEP = 5                      # Chấm eln
-# MCST_THINK_TIME_PER_TURN = 1.9          # Chấm offline
-MCST_THINK_TIME_PER_TURN = 0.027        # Chấm eln
+MCST_SIMU_DEEP = 10                     # Chấm offline
+# MCST_SIMU_DEEP = 5                      # Chấm eln
+MCST_THINK_TIME_PER_TURN = 1.9          # Chấm offline
+# MCST_THINK_TIME_PER_TURN = 0.027        # Chấm eln
 
 
 # Định nghĩa class node
