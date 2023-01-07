@@ -4,10 +4,12 @@ import numpy as np
 from app.ml_model import initModel
 from app.legalmove import LEGALMOVE
 from app.utils import xMove_to_xModel, yMove_to_yModel, list_to_tuple
-TRAINDATAFILE = 'traindata/data00.json'
-TRAIN_FROM_CHECKPOINT = False
-CHECKPOINT_FILE = ''
+TRAINDATAFILE = 'traindata/closeout.json'
+TRAIN_FROM_CHECKPOINT = True
+CHECKPOINT_FILE = 'weights/my_model_weights.h5'
 CHECKPOINT_SAVE = 'weights/my_model_weights.h5'
+EPOCHS = 200
+BATCH_SIZE = 10
 
 # ------ Tạo model
 model = initModel()
@@ -40,7 +42,7 @@ y_train = np.array(y_train)
 
 
 # ------ Thực hiện huấn luyện
-model.fit(x_train, y_train, epochs = 10)
+model.fit(x_train, y_train, epochs = EPOCHS, batch_size = BATCH_SIZE)
 
 
 # ------ Lưu lại weights
