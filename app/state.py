@@ -312,3 +312,14 @@ class State:
         if countTeam1 > countTeam2: return 1
         elif countTeam1 == countTeam2: return 0
         else: return -1
+    
+    # Định nghĩa hàm đếm số quân của mỗi bên sẽ trả về tuple (numOf(X), numOf(O))
+    def countPieceByTeam(self):
+        countTeam1 = 0
+        countTeam2 = 0
+        piece: Piece
+        for piece in self.pieceList:
+            if piece.team == 1: countTeam1 += 1
+            else: countTeam2 += 1
+        return (countTeam1, countTeam2)
+        
