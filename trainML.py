@@ -4,9 +4,9 @@ import numpy as np
 from app.ml_model import initModel
 from app.legalmove import LEGALMOVE
 from app.utils import xMove_to_xModel, yMove_to_yModel, list_to_tuple
-TRAINDATAFILE = 'traindata/data00.json'
-TRAIN_FROM_CHECKPOINT = False
-CHECKPOINT_FILE = ''
+TRAINDATAFILE = 'traindata/data01.json'
+TRAIN_FROM_CHECKPOINT = True
+CHECKPOINT_FILE = 'weights/my_model_weights.h5'
 CHECKPOINT_SAVE = 'weights/my_model_weights.h5'
 
 # ------ Tạo model
